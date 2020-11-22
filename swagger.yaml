@@ -1,0 +1,507 @@
+openapi: 3.0.1
+info:
+  title:  calendar
+  description: calendar service REST API
+  contact:
+    email: liudmyla.serkiz.knm.2019@lpnu.ua
+  version: 1.0.0
+servers:
+- url: https://my-calendar.io/api/v1
+- url: http://my-calendar.io/api/v1
+tags:
+- name: auth
+  description: API authorization
+- name: users
+  description: Operations with users
+- name: calendar
+  description: Operations with calendar
+- name: events
+  description: Opetations with events
+paths:
+  /auth:
+    post:
+      tags:
+      - auth
+      summary: Authenticates a user, returns a token
+      operationId: getAuthToken
+      requestBody:
+        description: Credentials
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Credentials'
+        required: true
+      responses:
+        200:
+          description: Access token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessToken'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+  /user:
+    get:
+      tags:
+      - users
+      summary: Lists users
+      operationId: listUsers
+      parameters:
+      - name: email
+        in: query
+        description: "Email to filter by"
+        schema:
+          type: string
+      - name: first_name
+        in: query
+        description: "First name to filter by"
+        schema:
+          type: string
+      - name: last_name
+        in: query
+        description: "Last name to filter by"
+        schema:
+          type: string
+      responses:
+        200:
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserData'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+      security:
+        - ApiKeyAuth: [ ]
+    post:
+      tags:
+      - users
+      summary: Creates a user
+      operationId: createUser
+      requestBody:
+        description: A new user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserToCreate'
+        required: true
+      responses:
+        200:
+          description: Created user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserData'
+        default:
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+      security:
+        - ApiKeyAuth: [ ]
+  /user/{user_id}:
+    get:
+      tags:
+      - users
+      summary: Gets user by id
+      operationId: getUserById
+      parameters:
+      - name: user_id
+        in: path
+        description: 'Id of a target user'
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Target user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserData'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+      security:
+        - ApiKeyAuth: [ ]
+    put:
+      tags:
+      - users
+      summary: Updates a user
+      operationId: updateUser
+      parameters:
+      - name: user_id
+        in: path
+        description: 'Id of a target user'
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        description: User data to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserToUpdate'
+        required: true
+      responses:
+        default:
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+      security:
+        - ApiKeyAuth: [ ]
+    delete:
+      tags:
+      - users
+      summary: Deletes a user
+      operationId: deleteUser
+      parameters:
+      - name: user_id
+        in: path
+        description: 'Id of a target user'
+        required: true
+        schema:
+          type: integer
+      responses:
+        default:
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+      security:
+      - ApiKeyAuth: [ ]
+  /calendar:
+    get:
+      tags:
+      - events
+      summary: Lists events of the authorized user
+      operationId: listWallets
+      responses:
+        200:
+          description: List of event of the authorized user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/calendarData'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+      security:
+      - ApiKeyAuth: [ ]
+    post:
+      tags:
+      - events
+      summary: Creates a event for the authorized user
+      operationId: createEvent
+      requestBody:
+        description: A new event for the authorized user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventToCreate'
+        required: true
+      responses:
+        200:
+          description: Created event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/calendarData'
+        default:
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+      security:
+      - ApiKeyAuth: [ ]
+  /calendar/{calendar_id}:
+    get:
+      tags:
+      - events
+      summary: Get event of the authorized user by id
+      operationId: getEventById
+      parameters:
+      - name: calendar_id
+        in: path
+        description: 'Id of a target event'
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Target event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/calendarData'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+      security:
+      - ApiKeyAuth: [ ]
+    put:
+      tags:
+      - events
+      summary: Updates a event of the authorized user
+      operationId: updateEvent
+      parameters:
+      - name: calendar_id
+        in: path
+        description: 'Id of a target event'
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        description: Event data to udpate
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventToUpdate'
+        required: true
+      responses:
+        default:
+          description: Creation status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+      security:
+      - ApiKeyAuth: [ ]
+    delete:
+      tags:
+      - events
+      summary: Delete a event of the authorized user
+      operationId: deleteEvent
+      parameters:
+      - name: calendar_id
+        in: path
+        description: 'Id of a target event'
+        required: true
+        schema:
+          type: integer
+      responses:
+        default:
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+      security:
+      - ApiKeyAuth: [ ]
+  /calendar/{calendar_id}/send-case:
+    post:
+      tags:
+      - events
+      summary: Share event from one calendar of the authorized user to another calendar of any user
+      operationId: sendCase
+      parameters:
+      - name: calendar_id
+        in: path
+        description: 'Id of a  calendar to send case from'
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        description: Events details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CaseToSend'
+        required: true
+      responses:
+        200:
+          description: option data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventsData'
+        default:
+          description: event status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+      security:
+        - ApiKeyAuth: [ ]
+  /calendar/{calendar_id}/events:
+    get:
+      tags:
+      - events
+      summary: Lists events shared to authorized user 
+      description: Includes events from and to a given calendar
+      operationId: getEventCase
+      parameters:
+      - name: calendar_id
+        in: path
+        description: 'Id of a target wallet'
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Event associated with a calendar
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventsData'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+      security:
+      - ApiKeyAuth: [ ]
+components:
+  schemas:
+    Credentials:
+      required:
+      - email
+      - password
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    AccessToken:
+      required:
+      - access_token
+      type: object
+      properties:
+        access_token:
+          type: string
+    UserData:
+      required:
+      - id
+      - email
+      type: object
+      properties:
+        uid:
+          type: integer
+        email:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+    UserToCreate:
+      required:
+      - email
+      - password
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+    UserToUpdate:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+    calendarData:
+      required:
+      - id
+      - funds
+      type: object
+      properties:
+        uid:
+          type: integer
+        name:
+          type: string
+        owner_uid:
+          type: integer
+        funds:
+          type: integer
+    EventToCreate:
+      type: object
+      properties:
+        name:
+          type: string
+    EventToUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+    CaseToSend:
+      required:
+      - to_wallet
+      - amount
+      type: object
+      properties:
+        to_wallet:
+          type: integer
+        amount:
+          type: integer
+    EventsData:
+      required:
+      - id
+      type: object
+      properties:
+        uid:
+          type: integer
+        from_wallet:
+          type: integer
+          nullable: true
+        to_wallet:
+          type: integer
+        amount:
+          type: integer
+        datetime:
+          type: string
+          format: date-time
+    StatusResponse:
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: integer
+        type:
+          type: string
+        message:
+          type: string
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
